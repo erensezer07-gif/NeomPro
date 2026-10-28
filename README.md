@@ -8,7 +8,9 @@
 
 **NeomPro**, bilgisayar açıldığında arka planda sessizce çalışan, **"Neom uyan"** sesli komutuyla aktifleşen, samimi bir arkadaş gibi sohbet edebilen ve bilgisayar üzerindeki sistem görevlerini yerine getiren Türkçe sesli yapay zeka asistanıdır. **"Neom uyu"** dediğinizde tekrar düşük kaynak tüketimli uyku moduna döner.
 
-![NeomPro Sesli Asistan Arayüzü](assets/neom_preview.png)
+## 📸 Çalışma Zamanı Konsol ve Diyalog Görünümü (`src/main.py`)
+
+![NeomPro Sesli Asistan Konsol Görünümü](screenshots/1_canli_konsol_log.png)
 
 ---
 
