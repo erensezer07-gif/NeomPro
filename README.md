@@ -1,126 +1,83 @@
-# NeomPro
+# 🎙️ NeomPro — Türkçe Sesli Yapay Zeka Asistanı (Wake-Word + Lokal LLM + Neural TTS)
 
-Türkçe sesli yapay zeka asistanı. Bilgisayar açılınca arka planda gizli çalışır, "**Neom uyan**" demenle uyanır, samimi bir arkadaş gibi muhabbet eder, sistem işlerini yapar, "**Neom uyu**" deyince tekrar uyku moduna geçer.
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![Ollama](https://img.shields.io/badge/LLM-Ollama_Llama_3.2-EA580C)
+![EdgeTTS](https://img.shields.io/badge/TTS-Microsoft_Edge_Neural-0284C7)
+![Piper](https://img.shields.io/badge/Offline_TTS-Piper-16A34A)
+![Windows](https://img.shields.io/badge/OS-Windows_Autostart-0078D6?logo=windows&logoColor=white)
 
-- **STT**: Google Speech Recognition (online, ücretsiz)
-- **LLM**: Ollama + llama3.2:3b (tamamen lokal, hızlı yanıt)
-- **TTS**: Microsoft Edge TTS, `tr-TR-EmelNeural` (online, ücretsiz, doğal nöral ses)
-- **Lokal yedek TTS**: Piper modeli ve binary'leri `bin/` + `models/tts/` altında duruyor (gerekirse `tts.py` Piper'a geri çevrilebilir)
+**NeomPro**, bilgisayar açıldığında arka planda sessizce çalışan, **"Neom uyan"** sesli komutuyla aktifleşen, samimi bir arkadaş gibi sohbet edebilen ve bilgisayar üzerindeki sistem görevlerini yerine getiren Türkçe sesli yapay zeka asistanıdır. **"Neom uyu"** dediğinizde tekrar düşük kaynak tüketimli uyku moduna döner.
 
-## Klasör Yapısı
+![NeomPro Sesli Asistan Arayüzü](assets/neom_preview.png)
 
-```
-NeomPro/
-├── src/                          # Python kaynak kodu
-│   ├── main.py                   # Giriş noktası ve dinleme döngüsü
-│   ├── config.py                 # Yollar, sabitler, sistem promptu
-│   ├── tts.py                    # Piper ile seslendirme
-│   ├── llm.py                    # Ollama ile sohbet
-│   ├── skills.py                 # Sistem komutları (uygulama aç, hava, ses vb.)
-│   └── tools/
-│       └── list_voices.py        # Yardımcı: pyttsx3 ses listesi
-├── bin/                          # Piper EXE + DLL + espeak-ng-data
-├── models/tts/                   # Piper Türkçe ses modeli
-├── scripts/
-│   ├── install_autostart.ps1     # Boot'ta otomatik başlatma kur
-│   ├── install_autostart.bat     #   (kolay tıklama için)
-│   ├── uninstall_autostart.ps1   # Kaldır
-│   └── uninstall_autostart.bat
-├── requirements.txt
-├── run.bat                       # Konsol açık şekilde başlat (debug)
-├── run-silent.bat                # Konsolsuz başlat (pythonw)
-└── README.md
+---
+
+## 🧠 Ses İşleme ve Yapay Zeka Hattı (Pipeline)
+
+```mermaid
+flowchart LR
+    A["🎙️ Mikrofon (Wake-Word Dinleme)"] -->|"Neom uyan"| B["Google STT ( Türkçe Ses -> Metin )"]
+    B --> C{"Sistem Komutu mu? (skills.py)"}
+    C -->|Evet| D["Uygulama Aç / Ses / Hava Durumu / Sistem"]
+    C -->|Sohbet| E["Ollama (llama3.2:3b Lokal LLM)"]
+    D --> F["Microsoft Edge Neural TTS (tr-TR-EmelNeural) / Piper Offline"]
+    E --> F
+    F --> G["🔊 Doğal Türkçe Sesli Yanıt"]
 ```
 
-## Kurulum
+* **STT (Konuşma Tanıma):** Google Speech Recognition ile yüksek doğruluklu Türkçe ses çözümleme.
+* **Lokal LLM:** **Ollama + `llama3.2:3b`** ile internet veya API ücreti gerektirmeden tamamen cihaz üzerinde hızlı yanıt üretimi.
+* **Doğal Nöral Seslendirme (TTS):** Microsoft Edge TTS (`tr-TR-EmelNeural`) + tamamen çevrimdışı durumlar için `bin/` altında gömülü **Piper Türkçe** ses modeli.
+* **Görev Zamanlayıcı Entegrasyonu:** `pythonw.exe` ile konsol penceresi açmadan arka planda başlar, olası çökme durumunda kendini otomatik yeniden başlatır.
 
-### 1. Python paketleri
-```powershell
-pip install -r requirements.txt
-```
+---
 
-### 2. Ollama
-[ollama.com](https://ollama.com/) sitesinden Ollama'yı kurun, sonra:
-```powershell
-ollama pull llama3
-```
-Ollama Windows'ta açılışta arka planda otomatik çalışır.
+## 🗣️ Örnek Sesli Komutlar
 
-### 3. Otomatik başlatma (boot'ta gizli çalışsın)
-[scripts/install_autostart.bat](scripts/install_autostart.bat) dosyasına çift tıklayın.
-
-Bu, **NeomAsistan** adında bir Görev Zamanlayıcı görevi oluşturur:
-- Oturum açıldığında otomatik başlar
-- `pythonw.exe` ile konsolsuz çalışır
-- Çökerse 3 kez yeniden başlatır
-- Süre limiti yoktur
-
-Kaldırmak için [scripts/uninstall_autostart.bat](scripts/uninstall_autostart.bat).
-
-## Kullanım
-
-Asistan açılışta **uyku modunda** başlar. Mikrofon hep dinlemededir ama yalnızca uyandırma kelimesine tepki verir.
-
-| Komut | Sonuç |
+| Sesli Komut | Asistanın Tepkisi |
 |---|---|
-| **Neom uyan** | Uyandırır, dinleme moduna alır |
-| **Neom uyu** / **kapan** / **sus** | Uyku moduna döner |
+| **"Neom uyan"** | Uyku modundan çıkar ve aktif dinlemeye geçer |
+| **"Neom uyu"** | Aktif diyaloğu sonlandırır ve uyandırma kelimesini bekler |
+| **"Saat kaç / Bugün hava nasıl?"** | Anlık sistem saati ve hava durumu bilgisini seslendirir |
+| **"Tarayıcıyı / VS Code'u aç"** | İlgili masaüstü uygulamasını veya web sitesini başlatır (`skills.py`) |
+| **Serbest Sohbet** | Lokal Llama 3.2 modeli üzerinden akıcı Türkçe sohbet eder |
 
-### Sohbet
-Uyandıktan sonra normal konuş — sistem komutu değilse llama3'e gider, samimi arkadaş tarzında cevaplar.
+---
 
-### Sistem komutları (dispatcher)
+## 📁 Klasör Yapısı
 
-**Bilgi**
-- "saat kaç"
-- "bugün ne, tarih ne"
-- "hava nasıl" (varsayılan şehir [config.py](src/config.py)'de — `WEATHER_CITY`)
+```text
+NeomPro/
+├── src/
+│   ├── main.py                   # Giriş noktası ve wake-word dinleme döngüsü
+│   ├── config.py                 # Yollar, sabitler ve asistan karakter promptu
+│   ├── tts.py                    # Edge Neural TTS & Piper seslendirme motoru
+│   ├── llm.py                    # Ollama lokal LLM bağlantı katmanı
+│   ├── skills.py                 # Sistem komutları (uygulama açma, ses, bilgi vb.)
+│   └── tools/list_voices.py      # Sistem seslerini listeleme aracı
+├── bin/                          # Piper EXE + DLL + espeak-ng-data
+├── models/tts/                   # Piper Türkçe çevrimdışı ses modeli
+├── scripts/                      # Windows Görev Zamanlayıcı otomatik başlatma betikleri
+├── run.bat                       # Konsol açık şekilde başlat (Geliştirme/Debug)
+└── run-silent.bat                # Konsolsuz arka planda başlat (pythonw)
+```
 
-**Uygulama açma** (chrome, edge, firefox, spotify, notepad, calc, vs code, explorer, ayarlar, discord, steam, telegram, whatsapp)
-- "chrome aç"
-- "spotify aç"
-- "hesap makinesi aç"
+---
 
-**Web**
-- "google aç" / "youtube aç"
-- "google'da kedi videoları ara"
-- "youtube'da lofi ara"
+## 🚀 Kurulum
 
-**Ses kontrolü**
-- "sesi aç" / "sesi kıs" / "sesi kapat" / "sustur"
-
-**Sistem**
-- "bilgisayarı kilitle"
-- "bilgisayarı kapat" (1 dk gecikme, iptal edilebilir)
-- "bilgisayarı yeniden başlat"
-- "kapanmayı iptal et"
-- "ekran görüntüsü al"
-
-**Diğer**
-- "klasör aç" → proje klasörünü açar
-
-## Manuel çalıştırma
-
-Debug (konsol görünür):
 ```powershell
+# 1. Python bağımlılıklarını yükleyin
+pip install -r requirements.txt
+
+# 2. Ollama üzerinden lokal modeli indirin
+ollama pull llama3.2:3b
+
+# 3. Başlatın (veya scripts/install_autostart.bat ile açılışa ekleyin)
 .\run.bat
 ```
 
-Sessiz (pythonw, arka planda):
-```powershell
-.\run-silent.bat
-```
+---
 
-## Loglar
-
-Çalışma kayıtları: `%LOCALAPPDATA%\NeomPro\neom.log`
-
-Sorun yaşarsanız bu dosyaya bakın.
-
-## Sistem promptu / kişilik
-
-Asistanın karakteri [src/config.py](src/config.py) içindeki `SYSTEM_PROMPT` değişkeninde. Daha resmi veya daha samimi yapmak için orayı düzenleyin.
-
-## Yeni komut eklemek
-
-[src/skills.py](src/skills.py) içindeki `dispatch()` fonksiyonuna yeni bir koşul ekleyin. Eğer dispatcher `None` döndürürse komut otomatik olarak LLM'e gider.
+## 👨‍💻 Geliştirici
+**Eren Sezer** — [GitHub Profilim](https://github.com/erensezer07-gif)
